@@ -37,8 +37,9 @@ std::vector<gEntity> IW5Engine::Server::World::GetGEntityList()
 	int toNext = off.dwToNextGEntity;
 	for (int i = 0; i < 255; i++) {
 		gEntity entity = ext.RPM<gEntity>(listBase + toNext);
-		if(entity.Valid == State::ALIVE)
+		if (entity.Valid == State::ALIVE && entity.ClientNum > 0 && entity.Position.x != 0 && entity.Position.y != 0 && entity.Position.z != 0) {
 			list.push_back(entity);
+		}
 		toNext += off.dwToNextGEntity;
 	}
 
@@ -54,7 +55,7 @@ bool IW5Engine::Functions::IsFriendly(int cNum, const gEntity* cEntity)
 
 int IW5Engine::Functions::AimTarget_IsTargetVisible(int cNum, gEntity* cEntity)
 {
-	typedef bool(__cdecl* stup)(int, const gEntity*);
+	typedef char(__cdecl* stup)(int, gEntity*);
 	stup setup = reinterpret_cast<stup>(off.AimTarget_IsTargetVisible);
 	return setup(cNum, cEntity);
 }
@@ -88,9 +89,7 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntity()
 		float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
 		if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
 			if (dist <= 9999999) {
-				if (entity.Position.x != 0 && entity.Position.y != 0 && entity.Position.z != 0) {
-					distList.insert({ dist, entity });
-				}
+				distList.insert({ dist, entity });
 			}
 		}
 	}
@@ -111,30 +110,33 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntityAim()
 {
 	Offsets offset; std::map<float, gEntity> distList = {}; Memory::External ext; IW5Engine engine;
 	CScreen::Info inf; Math math;
-	for (gEntity entity : engine.Server.World.GetGEntityList()) {
-		float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
-		if (dist <= 99999 && dist >= 2) {
-			if (engine.Functions.AimTarget_IsTargetVisible(entity.ClientNum, &entity)) {
-				distList.insert({ dist, entity });
+	if (!engine.Server.World.GetGEntityList().empty()) {
+		for (gEntity& entity : engine.Server.World.GetGEntityList()) {
+			float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
+			if (dist <= 99999 && dist >= 2) {
+				if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
+					distList.insert({ dist, entity });
+				}
 			}
 		}
 	}
-	std::map<float, gEntity>::iterator it; float min_val = 999999;
-	for (it = distList.begin(); it != distList.end(); it++) {
-		if (it->first < min_val) {
-			min_val = it->first;
+	if (!distList.empty()) {
+		std::map<float, gEntity>::iterator it; float min_val = 999999;
+		for (it = distList.begin(); it != distList.end(); it++) {
+			if (it->first < min_val) {
+				min_val = it->first;
+			}
+		}
+		gEntity rtn = distList.find(min_val)->second;
+		std::map<float, gEntity> finalMap = {};
+		if (rtn.Position.x != 0 && rtn.Position.y != 0 && rtn.Position.z != 0 && rtn.ClientNum > 0 && rtn.Valid == State::ALIVE) {
+			finalMap.insert({ min_val, rtn });
+			return finalMap;
 		}
 	}
-	gEntity rtn = distList.find(min_val)->second;
-	std::map<float, gEntity> finalMap = {};
-	if(rtn.Position.x != 0 && rtn.Position.y != 0 && rtn.Position.z != 0)
-		finalMap.insert({ min_val, rtn });
-	if (!finalMap.empty())
-		Globals::bLockedOn = true;
-	else
-		Globals::bLockedOn = false;
-
-	return finalMap;
+	
+	std::map<float, gEntity> emptyMap = {};
+	return emptyMap;
 }
 
 void IW5Engine::Player::View::Aimbot()
@@ -143,14 +145,18 @@ void IW5Engine::Player::View::Aimbot()
 	std::map<float, gEntity> distList = engine.Player.Location.GetClosestEntityAim();
 	std::map<float, gEntity>::iterator it;
 	if (!distList.empty()) {
-		if (Globals::bLockedOn) {
-			for (it = distList.begin(); it != distList.end(); it++);
-			gEntity entity = it->second;
+		for (it = distList.begin(); it != distList.end(); it++);
+		gEntity entity = it->second;
+
+		if (entity.Position.x != 0 && entity.Position.y != 0 && entity.Position.z != 0 && entity.ClientNum > 0 && entity.Valid == State::ALIVE) {
 			ViewMatrix vm = engine.Player.View.GetViewMatrix();
 			Vector3 pos = entity.Position;
-			pos.z += 40.f;
+			pos.z += 50.f;
 			Vector3 screenpos = WorldToScreen(pos, vm, inf.x, inf.y);
-			AimAtPos(screenpos.x, screenpos.y, inf.x, inf.y, Globals::iSmoothness);
+			float threshold = math.Dist2D(Vector2(inf.x / 2 + Globals::iRadius, inf.y / 2 + Globals::iRadius), Vector2(inf.x / 2 - Globals::iRadius, inf.y / 2 - Globals::iRadius));
+			float dist = math.Dist2D(Vector2(screenpos.x, screenpos.y), Vector2(inf.x / 2, inf.y / 2));
+			if (dist <= threshold)
+				AimAtPos(screenpos.x, screenpos.y, inf.x, inf.y, Globals::iSmoothness);
 		}
 	}
 }
