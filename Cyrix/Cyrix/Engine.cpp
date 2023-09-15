@@ -13,7 +13,7 @@ uintptr_t IW5Engine::Server::World::GEntity()
 {
 	Memory::ProcessInfo info;
 	uintptr_t base = info.moduleBase + 0x31266FC;
-	return ext.FinalAddress(base, { 0x2C }) - 0x398;
+	return ext.FinalAddress(base, { 0x2C }) - 0x3AC;
 }
 
 std::vector<centity_t> IW5Engine::Server::World::GetEntityList()
@@ -37,12 +37,26 @@ std::vector<gEntity> IW5Engine::Server::World::GetGEntityList()
 	int toNext = off.dwToNextGEntity;
 	for (int i = 0; i < 255; i++) {
 		gEntity entity = ext.RPM<gEntity>(listBase + toNext);
-		if (entity.Valid == State::ALIVE)
+		if(entity.Valid == State::ALIVE)
 			list.push_back(entity);
 		toNext += off.dwToNextGEntity;
 	}
 
 	return list;
+}
+
+bool IW5Engine::Functions::IsFriendly(int cNum, const gEntity* cEntity)
+{
+	typedef bool(__cdecl* stup)(int, const gEntity*);
+	stup setup = reinterpret_cast<stup>(off.CG_IsEntityFriendlyNotEnemy);
+	return setup(cNum, cEntity);
+}
+
+int IW5Engine::Functions::AimTarget_IsTargetVisible(int cNum, gEntity* cEntity)
+{
+	typedef bool(__cdecl* stup)(int, const gEntity*);
+	stup setup = reinterpret_cast<stup>(off.AimTarget_IsTargetVisible);
+	return setup(cNum, cEntity);
 }
 
 IntVector2 IW5Engine::Screen::GetResolution()
@@ -72,7 +86,7 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntity()
 
 	for (gEntity entity : engine.Server.World.GetGEntityList()) {
 		float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
-		if (entity.Valid == State::ALIVE) {
+		if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
 			if (dist <= 9999999) {
 				if (entity.Position.x != 0 && entity.Position.y != 0 && entity.Position.z != 0) {
 					distList.insert({ dist, entity });
@@ -99,20 +113,9 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntityAim()
 	CScreen::Info inf; Math math;
 	for (gEntity entity : engine.Server.World.GetGEntityList()) {
 		float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
-		if (entity.Valid == State::ALIVE) {
-			if (dist <= 99999 && dist >= 2) {
-				if (entity.Position.x != 0 && entity.Position.y != 0 && entity.Position.z != 0) {
-					ViewMatrix vm = engine.Player.View.GetViewMatrix();
-					Vector3 pos = entity.Position; pos.z += 40.f;
-					Vector3 screenpos = WorldToScreen(pos, vm, inf.x, inf.y);
-					if (screenpos.z > 0.001f) {
-						float threshold = math.Dist2D(Vector2(inf.x / 2 + Globals::iRadius, inf.y / 2 + Globals::iRadius), Vector2(inf.x / 2 - Globals::iRadius, inf.y - Globals::iRadius));
-						float dist = math.Dist2D(Vector2(screenpos.x, screenpos.y), Vector2(inf.x / 2, inf.y / 2));
-						if (dist <= threshold) {
-							distList.insert({ dist, entity });
-						}
-					}
-				}
+		if (dist <= 99999 && dist >= 2) {
+			if (engine.Functions.AimTarget_IsTargetVisible(entity.ClientNum, &entity)) {
+				distList.insert({ dist, entity });
 			}
 		}
 	}

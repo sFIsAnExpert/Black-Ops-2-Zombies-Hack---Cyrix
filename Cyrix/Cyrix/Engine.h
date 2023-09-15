@@ -53,7 +53,9 @@ public:
 	struct Functions {
 	public:
 		void print_to_screen(std::string msg);
+		bool IsFriendly(int, const gEntity*);
 		int CL_GetCurrentCmdNumber();
+		int AimTarget_IsTargetVisible(int, gEntity*);
 	};
 	Screen Screen;
 	Player Player;
