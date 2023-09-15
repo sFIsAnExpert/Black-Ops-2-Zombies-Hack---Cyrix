@@ -85,25 +85,33 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntity()
 {
 	Offsets offset; std::map<float, gEntity> distList = {}; Memory::External ext; IW5Engine engine;
 
-	for (gEntity entity : engine.Server.World.GetGEntityList()) {
-		float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
-		if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
+	if (!engine.Server.World.GetGEntityList().empty()) {
+		for (gEntity& entity : engine.Server.World.GetGEntityList()) {
+			float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
 			if (dist <= 9999999) {
-				distList.insert({ dist, entity });
+				if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
+					distList.insert({ dist, entity });
+				}
 			}
 		}
 	}
-	std::map<float, gEntity>::iterator it; float min_val = 99999999;
-	for (it = distList.begin(); it != distList.end(); it++) {
-		if (it->first < min_val) {
-			min_val = it->first;
+	if (!distList.empty()) {
+		std::map<float, gEntity>::iterator it; float min_val = 999999;
+		for (it = distList.begin(); it != distList.end(); it++) {
+			if (it->first < min_val) {
+				min_val = it->first;
+			}
+		}
+		gEntity rtn = distList.find(min_val)->second;
+		std::map<float, gEntity> finalMap = {};
+		if (rtn.Position.x != 0 && rtn.Position.y != 0 && rtn.Position.z != 0 && rtn.ClientNum > 0 && rtn.Valid == State::ALIVE) {
+			finalMap.insert({ min_val, rtn });
+			return finalMap;
 		}
 	}
-	gEntity rtn = distList.find(min_val)->second;
-	std::map<float, gEntity> finalMap = {};
-	finalMap.insert({ min_val, rtn });
 
-	return finalMap;
+	std::map<float, gEntity> emptyMap = {};
+	return emptyMap;
 }
 
 std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntityAim()
