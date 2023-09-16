@@ -40,18 +40,23 @@ void CreateGui() {
 	}
 	ImGui::NewLine();
 	if (Globals::iTab == 1) {
-		ImGui::Checkbox(D("DRO").c_str(), &Globals::bEsp); ImGui::SameLine();
+		ImGui::Checkbox(D("DRO").c_str(), &Globals::bEsp); 
+		if (Globals::bEsp) {
+			ImGui::SameLine();
+			ImGui::Checkbox("Fill", &Globals::bAimbot);
+		}
 		ImGui::Checkbox(D("Rm`okhmdr").c_str(), &Globals::bSnapLines);
-		ImGui::NewLine();
 		if (ImGui::Checkbox(D("Bg`lr").c_str(), &Globals::bChams)) {
 			Memory::External ext;
 			if (Globals::bChams) {
-				ext.WPM<float>(0x2A0F1C0, 255);
-				ext.WPM<float>(0x2A0F1C4, 55);
+				ext.WPM<float>(0x2A0F1C0, Globals::iChamsR);
+				ext.WPM<float>(0x2A0F1C4, Globals::iChamsG);
+				ext.WPM<float>(0x2A0F1C8, Globals::iChamsB);
 			}
 			else {
 				ext.WPM<float>(0x2A0F1C0, 0);
 				ext.WPM<float>(0x2A0F1C4, 0);
+				ext.WPM<float>(0x2A0F1C8, 0);
 			}
 		}
 	}
@@ -69,10 +74,13 @@ void CreateGui() {
 		}
 	}
 	if (Globals::iTab == 3) {
-		ImGui::SliderFloat("R", &Globals::R, 0, 255);
-		ImGui::SliderFloat("G", &Globals::G, 0, 255);
-		ImGui::SliderFloat("B", &Globals::B, 0, 255);
-		ImGui::SliderFloat("A", &Globals::A, 0, 255);
+		ImGui::SliderInt("ESP Color", &Globals::iRGBESP, 0, 16777215);
+		ImGui::SameLine(); ImGui::Checkbox("Animate", &Globals::bEspAnim);
+		ImGui::SliderInt("Snaplines Color", &Globals::iRGBSnap, 0, 16777215);
+		ImGui::SameLine(); ImGui::Checkbox("Animate", &Globals::bSnapAnim);
+		ImGui::SliderInt("Chams R", &Globals::iChamsR, 0, 255); 
+		ImGui::SliderInt("Chams G", &Globals::iChamsG, 0, 255); 
+		ImGui::SliderInt("Chams B", &Globals::iChamsB, 0, 255);
 	}
 	if (Globals::iTab == 5) {
 		ImGui::Checkbox(D("Hmehmhsd Lnmdx").c_str(), &Globals::bInfMoney);
@@ -91,16 +99,5 @@ void CreateGui() {
 }
 
 void ManageImGui(ID3D11DeviceContext* pContext, ID3D11RenderTargetView* mainRenderTargetView) {
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
-	ImGui::Begin(D("Oktsnmhtl Ynlahdr , Bg`rdOk`xr").c_str());
-
 	CreateGui();
-	ImGui::End();
-	ImGui::Render();
-
-	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }

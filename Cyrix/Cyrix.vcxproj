@@ -19,8 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Cyrix\D3D11Renderer.cpp" />
-    <ClCompile Include="Cyrix\D3D11StateSaver.cpp" />
     <ClCompile Include="Cyrix\Engine.cpp" />
     <ClCompile Include="Cyrix\Math.cpp" />
     <ClCompile Include="Cyrix\Memory.cpp" />
@@ -40,9 +38,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cyrix\D3D11Renderer.h" />
-    <ClInclude Include="Cyrix\D3D11Shader.h" />
-    <ClInclude Include="Cyrix\D3D11StateSaver.h" />
     <ClInclude Include="Cyrix\Engine.h" />
     <ClInclude Include="Cyrix\includes.h" />
     <ClInclude Include="Cyrix\Math.h" />

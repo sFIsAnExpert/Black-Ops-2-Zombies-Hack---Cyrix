@@ -2,18 +2,15 @@
 #include "ImGuiManage.h"
 #include "kiero/minhook/include/MinHook.h"
 
-int cNum = 0;
-
-void AdjustNum() {
+void miscThread() {
 	while (1) {
-		if (GetAsyncKeyState(VK_F1) & 1) {
-			cNum++;
-			std::cout << "CNUM - " << cNum << "\n";
+		if (Globals::bEspAnim) {
+			Globals::iRGBESP = Rand(0, 16777215);
 		}
-		if (GetAsyncKeyState(VK_F2) & 1) {
-			cNum--;
-			std::cout << "CNUM - " << cNum << "\n";
+		if (Globals::bSnapAnim) {
+			Globals::iRGBSnap = Rand(0, 16777215);
 		}
+		Sleep(300);
 	}
 }
 
@@ -42,9 +39,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	{
 		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)& pDevice)))
 		{
-			dxRender = new D3D11Renderer(pSwapChain);
 			pDevice->GetImmediateContext(&pContext);
-			dxRender->Initialize();
 			DXGI_SWAP_CHAIN_DESC sd;
 			pSwapChain->GetDesc(&sd);
 			window = sd.OutputWindow;
@@ -61,7 +56,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
 
-	dxRender->BeginScene();
+	
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Cyrix - ChasePlays");
 
 	if (Globals::bEsp) {
 		for (const gEntity& entity : engine.Server.World.GetGEntityList()) {
@@ -73,16 +73,20 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			float height = screenhead.y - screenpos.y;
 			float width = height / 2.4f;
 			if (screenpos.z > 0.001f) {
-				dxRender->FillRect(screenpos.x - (width / 2.3), screenpos.y, width, height, Color(Globals::A, Globals::R, Globals::G, Globals::B));
+				ImGui::GetBackgroundDrawList()->AddRect(ImVec2(screenpos.x - (width / 2.3), screenpos.y), ImVec2(screenpos.x + (width / 2.3), screenpos.y + height), ImColor(Globals::iRGBESP & 255, (Globals::iRGBESP >> 8) & 255, (Globals::iRGBESP >> 16)&255));
 				if (Globals::bSnapLines)
-					dxRender->DrawLine(Resolution.x / 2, Resolution.y, screenpos.x, screenpos.y, Color(Globals::A, Globals::R, Globals::G, Globals::B));
+					ImGui::GetBackgroundDrawList()->AddLine(ImVec2(Resolution.x / 2, Resolution.y), ImVec2(screenpos.x, screenpos.y), ImColor(Globals::iRGBSnap & 255, (Globals::iRGBSnap >> 8) & 255, (Globals::iRGBSnap >> 16) & 255));
 			}
 		}
 	}
 
-	dxRender->EndScene();
-
 	ManageImGui(pContext, mainRenderTargetView);
+
+	ImGui::End();
+	ImGui::Render();
+
+	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
@@ -172,8 +176,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	if (MH_EnableHook((LPVOID*)rAddTarget) != MH_OK)
 		std::cout << "Failed!!\n";
 
-	std::thread th1(AdjustNum);
-	th1.detach();
+	std::thread tMisc(miscThread);
+	tMisc.detach();
 
 	while (true) {
 		if (Globals::bInfMoney) {

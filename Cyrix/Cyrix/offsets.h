@@ -24,12 +24,6 @@ struct Offsets {
 	uintptr_t CL_WritePacket = 0x444C60;
 };
 
-struct Chams {
-public:
-	float R, G, B, A;
-};
-
-
 enum EntityFlags : unsigned __int32 {
 	STANDING = 2,
 	CROUCH = 6,

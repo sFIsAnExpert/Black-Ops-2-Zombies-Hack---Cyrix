@@ -33,12 +33,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Cyrix\D3D11Renderer.cpp">
-      <Filter>Cyrix</Filter>
-    </ClCompile>
-    <ClCompile Include="Cyrix\D3D11StateSaver.cpp">
-      <Filter>Cyrix</Filter>
-    </ClCompile>
     <ClCompile Include="Cyrix\Engine.cpp">
       <Filter>Cyrix</Filter>
     </ClCompile>
@@ -94,15 +88,6 @@
     </ClInclude>
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Cyrix\D3D11Renderer.h">
-      <Filter>Cyrix</Filter>
-    </ClInclude>
-    <ClInclude Include="Cyrix\D3D11Shader.h">
-      <Filter>Cyrix</Filter>
-    </ClInclude>
-    <ClInclude Include="Cyrix\D3D11StateSaver.h">
-      <Filter>Cyrix</Filter>
     </ClInclude>
     <ClInclude Include="Cyrix\Engine.h">
       <Filter>Cyrix</Filter>
