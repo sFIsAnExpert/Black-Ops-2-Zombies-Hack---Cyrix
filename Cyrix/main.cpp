@@ -10,7 +10,7 @@ void miscThread() {
 		if (Globals::bSnapAnim) {
 			Globals::iRGBSnap = Rand(0, 16777215);
 		}
-		Sleep(300);
+		Sleep(Globals::iAnimSpd);
 	}
 }
 
@@ -74,6 +74,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			float width = height / 2.4f;
 			if (screenpos.z > 0.001f) {
 				ImGui::GetBackgroundDrawList()->AddRect(ImVec2(screenpos.x - (width / 2.3), screenpos.y), ImVec2(screenpos.x + (width / 2.3), screenpos.y + height), ImColor(Globals::iRGBESP & 255, (Globals::iRGBESP >> 8) & 255, (Globals::iRGBESP >> 16)&255));
+				if (Globals::bFill)
+					ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(screenpos.x - (width / 2.3), screenpos.y), ImVec2(screenpos.x + (width / 2.3), screenpos.y + height), ImColor(0,0,0,70));
 				if (Globals::bSnapLines)
 					ImGui::GetBackgroundDrawList()->AddLine(ImVec2(Resolution.x / 2, Resolution.y), ImVec2(screenpos.x, screenpos.y), ImColor(Globals::iRGBSnap & 255, (Globals::iRGBSnap >> 8) & 255, (Globals::iRGBSnap >> 16) & 255));
 			}
@@ -140,7 +142,7 @@ int __cdecl hkWritePacket(int num) {
 
 int rAddHook(int* a1, int ent, int ent_num, int renderflags, int a2, int a3, int a4, bool a5, int a6, int scs, int a8, float a9, bool a10) {
 	if (Globals::bChams) {
-		if (ent_num >= 20 && ent_num <= 45) {
+		if (ent_num >= 23 && ent_num <= 45) {
 			return rAdd(a1, ent, ent_num, -1, a2, a3, a4, a5, a6, scs, a8, a9, a10);
 		}
 	}
@@ -169,6 +171,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	{
 		MessageBoxA(0, "MH Failed", "Failed", 0);
 	}
+	MH_Initialize();
 	if (MH_CreateHook((LPVOID*)rAddTarget, &rAddHook, (void**)&rAdd) != MH_OK)
 	{
 		MessageBoxA(0, "MH Failed", "Failed", 0);

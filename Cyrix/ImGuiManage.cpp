@@ -43,7 +43,7 @@ void CreateGui() {
 		ImGui::Checkbox(D("DRO").c_str(), &Globals::bEsp); 
 		if (Globals::bEsp) {
 			ImGui::SameLine();
-			ImGui::Checkbox("Fill", &Globals::bAimbot);
+			ImGui::Checkbox("Fill", &Globals::bFill);
 		}
 		ImGui::Checkbox(D("Rm`okhmdr").c_str(), &Globals::bSnapLines);
 		if (ImGui::Checkbox(D("Bg`lr").c_str(), &Globals::bChams)) {
@@ -75,9 +75,10 @@ void CreateGui() {
 	}
 	if (Globals::iTab == 3) {
 		ImGui::SliderInt("ESP Color", &Globals::iRGBESP, 0, 16777215);
-		ImGui::SameLine(); ImGui::Checkbox("Animate", &Globals::bEspAnim);
+		ImGui::SameLine(); ImGui::Checkbox("ESP Animate", &Globals::bEspAnim);
 		ImGui::SliderInt("Snaplines Color", &Globals::iRGBSnap, 0, 16777215);
-		ImGui::SameLine(); ImGui::Checkbox("Animate", &Globals::bSnapAnim);
+		ImGui::SameLine(); ImGui::Checkbox("Snap Animate", &Globals::bSnapAnim);
+		ImGui::SliderInt("Animation Speed", &Globals::iAnimSpd, 0, 10000);
 		ImGui::SliderInt("Chams R", &Globals::iChamsR, 0, 255); 
 		ImGui::SliderInt("Chams G", &Globals::iChamsG, 0, 255); 
 		ImGui::SliderInt("Chams B", &Globals::iChamsB, 0, 255);
