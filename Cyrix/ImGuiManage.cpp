@@ -42,6 +42,18 @@ void CreateGui() {
 	if (Globals::iTab == 1) {
 		ImGui::Checkbox(D("DRO").c_str(), &Globals::bEsp); ImGui::SameLine();
 		ImGui::Checkbox(D("Rm`okhmdr").c_str(), &Globals::bSnapLines);
+		ImGui::NewLine();
+		if (ImGui::Checkbox(D("Bg`lr").c_str(), &Globals::bChams)) {
+			Memory::External ext;
+			if (Globals::bChams) {
+				ext.WPM<float>(0x2A0F1C0, 255);
+				ext.WPM<float>(0x2A0F1C4, 55);
+			}
+			else {
+				ext.WPM<float>(0x2A0F1C0, 0);
+				ext.WPM<float>(0x2A0F1C4, 0);
+			}
+		}
 	}
 	if (Globals::iTab == 2) {
 		ImGui::Checkbox(D("@hlans").c_str(), &Globals::bAimbot);

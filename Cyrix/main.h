@@ -5,6 +5,9 @@
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+typedef int(__cdecl* R_AddDObjToScene)(int* a1, int ent, int ent_num, int renderflags, int a2, int a3, int a4, bool a5, int a6, int scs, int a8, float a9, bool a10);
+R_AddDObjToScene rAdd, rAddTarget;
+
 typedef int(__cdecl* CL_WritePacket)(int);
 CL_WritePacket pHookWritePacket = 0;
 CL_WritePacket pHookWritePacketTarget = 0;

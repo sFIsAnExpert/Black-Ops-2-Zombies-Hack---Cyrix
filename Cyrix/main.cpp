@@ -2,6 +2,21 @@
 #include "ImGuiManage.h"
 #include "kiero/minhook/include/MinHook.h"
 
+int cNum = 0;
+
+void AdjustNum() {
+	while (1) {
+		if (GetAsyncKeyState(VK_F1) & 1) {
+			cNum++;
+			std::cout << "CNUM - " << cNum << "\n";
+		}
+		if (GetAsyncKeyState(VK_F2) & 1) {
+			cNum--;
+			std::cout << "CNUM - " << cNum << "\n";
+		}
+	}
+}
+
 void InitImGui()
 {
 	ImGui::CreateContext();
@@ -119,6 +134,15 @@ int __cdecl hkWritePacket(int num) {
 	return pHookWritePacket(num);
 }
 
+int rAddHook(int* a1, int ent, int ent_num, int renderflags, int a2, int a3, int a4, bool a5, int a6, int scs, int a8, float a9, bool a10) {
+	if (Globals::bChams) {
+		if (ent_num >= 20 && ent_num <= 45) {
+			return rAdd(a1, ent, ent_num, -1, a2, a3, a4, a5, a6, scs, a8, a9, a10);
+		}
+	}
+	return rAdd(a1, ent, ent_num, renderflags, a2, a3, a4, a5, a6, scs, a8, a9, a10);
+}
+
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
 	CScreen::Info sInfo;
@@ -136,10 +160,20 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	} while (!init_hook);
 
 	pHookWritePacketTarget = reinterpret_cast<CL_WritePacket>(offsets.CL_WritePacket);
+	rAddTarget = reinterpret_cast<R_AddDObjToScene>(offsets.R_AddDObjToScene);
 	if (MH_CreateHook((LPVOID*)pHookWritePacketTarget, &hkWritePacket, (void**)&pHookWritePacket) != MH_OK)
 	{
 		MessageBoxA(0, "MH Failed", "Failed", 0);
 	}
+	if (MH_CreateHook((LPVOID*)rAddTarget, &rAddHook, (void**)&rAdd) != MH_OK)
+	{
+		MessageBoxA(0, "MH Failed", "Failed", 0);
+	}
+	if (MH_EnableHook((LPVOID*)rAddTarget) != MH_OK)
+		std::cout << "Failed!!\n";
+
+	std::thread th1(AdjustNum);
+	th1.detach();
 
 	while (true) {
 		if (Globals::bInfMoney) {

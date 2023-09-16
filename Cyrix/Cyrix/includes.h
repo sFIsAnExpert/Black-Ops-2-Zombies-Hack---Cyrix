@@ -33,9 +33,9 @@ namespace Globals
 	inline int iTabCount = 0;
 	inline int iTab = 0, iChatAmount = 1;
 	inline int iSmoothness = 50, iCircleRadius = 40, iRadius = 10;
-	inline float iCircleThickness = 1.5f, iFoV = 1.25, R = 255.0f, G = 0, B = 0, A = 55.f;
+	inline float iCircleThickness = 1.5f, iFoV = 1.25, R = 255.0f, G = 0, B = 0, A = 55.f, chamsR = 255.0f, chamsG = 55.0f, chamsB = 0.f;
 	inline bool bEsp = false, bDrawCircle = false, bDrawHealth = false, bSnapLines = false, bInfMoney = false, bAimbot = false, bSilentAim = false, bInfAmmo = false;
-	inline bool bGodmode = false, bGodmodeChk = false, bLockedOn = false, bHoldingAimbot = false, bSilentAimChk = false, bSilentUnhook = false;
+	inline bool bGodmode = false, bGodmodeChk = false, bLockedOn = false, bHoldingAimbot = false, bSilentAimChk = false, bSilentUnhook = false, bChams = false;
 }
 
 #endif

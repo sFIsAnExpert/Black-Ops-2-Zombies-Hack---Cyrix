@@ -19,8 +19,14 @@ struct Offsets {
 	uintptr_t dwPlayerInfo_t = 0x23427A0;
 	uintptr_t dwHealth = 0x21C1568;
 
+	uintptr_t R_AddDObjToScene = 0x724CC0;
 	uintptr_t CL_GetCurrentCmdNumber = 0x490A50;
 	uintptr_t CL_WritePacket = 0x444C60;
+};
+
+struct Chams {
+public:
+	float R, G, B, A;
 };
 
 
