@@ -32,7 +32,7 @@ void CL_WritePacketHook() {
 			++oldCmd->serverTime;
 			--cmd->serverTime;
 
-			gEntity entity = tengine.Player.Location.SilentClosestEntity();
+			centity_t entity = tengine.Player.Location.SilentClosestEntity();
 			if (entity.Valid != EntityState::BAD_ENTITY) {
 				LocalPlayer p = tengine.Player.GetLocalPlayer();
 				Vector3 them = entity.Position; them.z += 52.f;

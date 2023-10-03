@@ -116,7 +116,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::Begin(Xor("Cyrix - ChasePlays"));
 
 	if (Globals::bEsp) {
-		for (const gEntity& entity : engine.Server.World.GetGEntityList()) {
+		for (const centity_t& entity : engine.Server.World.GetEntityList()) {
 			ViewMatrix vm = engine.Player.View.GetViewMatrix();
 			Vector3 pos = entity.Position;
 			Vector3 headPos; headPos.x = pos.x; headPos.y = pos.y; headPos.z = pos.z + 75.f;

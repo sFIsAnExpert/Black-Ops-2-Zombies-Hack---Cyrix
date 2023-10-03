@@ -9,7 +9,7 @@ ViewMatrix IW5Engine::Player::View::GetViewMatrix()
 	return in.RPM<ViewMatrix>(off.dwViewMatrix);
 }
 
-uintptr_t IW5Engine::Server::World::GEntity()
+uintptr_t IW5Engine::Server::World::CEntityPtr()
 {
 	Memory::ProcessInfo info;
 	uintptr_t base = info.moduleBase + 0x31266FC;
@@ -17,46 +17,48 @@ uintptr_t IW5Engine::Server::World::GEntity()
 	return finalPtr;
 }
 
-std::vector<centity_t> IW5Engine::Server::World::GetEntityList()
-{
-    std::vector<centity_t> list = {};
-    int toNext = off.dwToNextLocal;
-    for (int i = 0; i < 255; i++) {
-        centity_t entity = ext.RPM<centity_t>(off.dwEntityList + toNext);
-        if(entity.Health > 0)
-            list.push_back(entity);
-        toNext += off.dwToNextLocal;
-    }
 
-    return list;
+Vector3* IW5Engine::Functions::AdjustModelState(Vector3* vec, int state)
+{
+	Vector3* ret = new Vector3(); ret->x = vec->x; ret->y = vec->y; ret->z = vec->z;
+	if (state == MODEL_STATE::STANDING || state == MODEL_STATE::STANDING2)
+		ret->z += 53.f;
+	else if (state == MODEL_STATE::CROUCH || state == MODEL_STATE::CROUCH2)
+		ret->z += 42.f;
+	else if (state == MODEL_STATE::PRONE || state == MODEL_STATE::PRONE2)
+		ret->z += 12.f;
+	else
+		ret->z += 53.f;
+
+	return ret;
 }
 
-std::vector<gEntity> IW5Engine::Server::World::GetGEntityList()
+std::vector<centity_t> IW5Engine::Server::World::GetEntityList()
 {
-	std::vector<gEntity> list = {};
-	uintptr_t listBase = this->GEntity();
-	int toNext = off.dwToNextGEntity;
+	std::vector<centity_t> list = {};
+	uintptr_t listBase = this->CEntityPtr();
+	int toNext = off.dwToNextcentity_t;
 	for (int i = 0; i <150; i++) {
-		gEntity entity = ext.RPM<gEntity>(listBase + toNext);
+		centity_t entity = ext.RPM<centity_t>(listBase + toNext);
 		if (entity.Valid == State::ALIVE && entity.ClientNum > 0) {
 			list.push_back(entity);
 		}
-		toNext += off.dwToNextGEntity;
+		toNext += off.dwToNextcentity_t;
 	}
 
 	return list;
 }
 
-bool IW5Engine::Functions::IsFriendly(int cNum, const gEntity* cEntity)
+bool IW5Engine::Functions::IsFriendly(int cNum, const centity_t* cEntity)
 {
-	typedef bool(__cdecl* stup)(int, const gEntity*);
+	typedef bool(__cdecl* stup)(int, const centity_t*);
 	stup setup = reinterpret_cast<stup>(off.CG_IsEntityFriendlyNotEnemy);
 	return setup(cNum, cEntity);
 }
 
-int IW5Engine::Functions::AimTarget_IsTargetVisible(gEntity* entity)
+int IW5Engine::Functions::AimTarget_IsTargetVisible(centity_t* entity)
 {
-	typedef char(__cdecl* stup)(int, gEntity*);
+	typedef char(__cdecl* stup)(int, centity_t*);
 	stup setup = reinterpret_cast<stup>(off.AimTarget_IsTargetVisible);
 	
 	return setup(0, entity);
@@ -83,19 +85,12 @@ int IW5Engine::Functions::CL_GetCurrentCmdNumber()
 	return GetCmdNum(0);
 }
 
-gEntity* IW5Engine::Functions::CG_GetEntity(int cNum)
-{
-	typedef gEntity*(__cdecl* setup)(int, int);
-	setup CG_GetEntity = reinterpret_cast<setup>(off.CG_GetEntity);
-	return CG_GetEntity(0, cNum);
-}
-
-gEntity IW5Engine::Player::Location::SilentClosestEntity()
+centity_t IW5Engine::Player::Location::SilentClosestEntity()
 {
 	IW5Engine engine; int max_dist = 999999, i = 0, entAt = 0;
-	gEntity badEnt; badEnt.Valid = EntityState::BAD_ENTITY; bool isVis = false;
-	std::vector<gEntity> list = engine.Server.World.GetGEntityList();
-	for (gEntity entity : list) {
+	centity_t badEnt; badEnt.Valid = EntityState::BAD_ENTITY; bool isVis = false;
+	std::vector<centity_t> list = engine.Server.World.GetEntityList();
+	for (centity_t entity : list) {
 		int dist = (int)(Dist3D(engine.Player.GetLocalPlayer().Position, entity.Position));
 		if (engine.Functions.AimTarget_IsTargetVisible(&entity)) {
 			if (!isVis)
@@ -121,12 +116,12 @@ gEntity IW5Engine::Player::Location::SilentClosestEntity()
 	return badEnt;
 }
 
-std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntity()
+std::map<float, centity_t> IW5Engine::Player::Location::GetClosestEntity()
 {
-	Offsets offset; std::map<float, gEntity> distList = {}; Memory::External ext; IW5Engine engine;
+	Offsets offset; std::map<float, centity_t> distList = {}; Memory::External ext; IW5Engine engine;
 
-	if (!engine.Server.World.GetGEntityList().empty()) {
-		for (gEntity& entity : engine.Server.World.GetGEntityList()) {
+	if (!engine.Server.World.GetEntityList().empty()) {
+		for (centity_t& entity : engine.Server.World.GetEntityList()) {
 			float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
 			if (dist <= 9999999) {
 				if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
@@ -136,28 +131,28 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntity()
 		}
 	}
 	if (!distList.empty()) {
-		std::map<float, gEntity>::iterator it; float min_val = 999999;
+		std::map<float, centity_t>::iterator it; float min_val = 999999;
 		for (it = distList.begin(); it != distList.end(); it++) {
 			if (it->first < min_val) {
 				min_val = it->first;
 			}
 		}
-		gEntity rtn = distList.find(min_val)->second;
-		std::map<float, gEntity> finalMap = {};
+		centity_t rtn = distList.find(min_val)->second;
+		std::map<float, centity_t> finalMap = {};
 		finalMap.insert({ min_val, rtn });
 		return finalMap;
 	}
 
-	std::map<float, gEntity> emptyMap = {};
+	std::map<float, centity_t> emptyMap = {};
 	return emptyMap;
 }
 
-std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntityAim()
+std::map<float, centity_t> IW5Engine::Player::Location::GetClosestEntityAim()
 {
-	Offsets offset; std::map<float, gEntity> distList = {}; Memory::External ext; IW5Engine engine;
+	Offsets offset; std::map<float, centity_t> distList = {}; Memory::External ext; IW5Engine engine;
 	CScreen::Info inf; Math math;
-	if (!engine.Server.World.GetGEntityList().empty()) {
-		for (gEntity& entity : engine.Server.World.GetGEntityList()) {
+	if (!engine.Server.World.GetEntityList().empty()) {
+		for (centity_t& entity : engine.Server.World.GetEntityList()) {
 			float dist = Dist3D(engine.Player.Location.Position(), entity.Position);
 			if (dist <= 99999) {
 				if (!engine.Functions.IsFriendly(entity.ClientNum, &entity)) {
@@ -167,30 +162,30 @@ std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntityAim()
 		}
 	}
 	if (!distList.empty()) {
-		std::map<float, gEntity>::iterator it; float min_val = 999999;
+		std::map<float, centity_t>::iterator it; float min_val = 999999;
 		for (it = distList.begin(); it != distList.end(); it++) {
 			if (it->first < min_val) {
 				min_val = it->first;
 			}
 		}
-		gEntity rtn = distList.find(min_val)->second;
-		std::map<float, gEntity> finalMap = {};
+		centity_t rtn = distList.find(min_val)->second;
+		std::map<float, centity_t> finalMap = {};
 		finalMap.insert({ min_val, rtn });
 		return finalMap;
 	}
 	
-	std::map<float, gEntity> emptyMap = {};
+	std::map<float, centity_t> emptyMap = {};
 	return emptyMap;
 }
 
 void IW5Engine::Player::View::Aimbot()
 {
 	IW5Engine engine; Math math; CScreen::Info inf;
-	std::map<float, gEntity> distList = engine.Player.Location.GetClosestEntityAim();
-	std::map<float, gEntity>::iterator it;
+	std::map<float, centity_t> distList = engine.Player.Location.GetClosestEntityAim();
+	std::map<float, centity_t>::iterator it;
 	if (!distList.empty()) {
 		for (it = distList.begin(); it != distList.end(); it++);
-		gEntity entity = it->second;
+		centity_t entity = it->second;
 
 		ViewMatrix vm = engine.Player.View.GetViewMatrix();
 		Vector3 pos = entity.Position;

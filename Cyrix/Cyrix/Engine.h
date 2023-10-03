@@ -17,9 +17,9 @@ public:
 		struct Location {
 		public:
 			Vector3 Position();
-			gEntity SilentClosestEntity();
-			std::map<float, gEntity> GetClosestEntity();
-			std::map<float, gEntity> GetClosestEntityAim();
+			centity_t SilentClosestEntity();
+			std::map<float, centity_t> GetClosestEntity();
+			std::map<float, centity_t> GetClosestEntityAim();
 		};
 		struct Health {
 		public:
@@ -41,9 +41,8 @@ public:
 	public:
 		struct World {
 		public:
-			uintptr_t GEntity();
+			uintptr_t CEntityPtr();
 			std::vector<centity_t> GetEntityList();
-			std::vector<gEntity> GetGEntityList();
 		};
 		World World;
 	};
@@ -54,10 +53,10 @@ public:
 	struct Functions {
 	public:
 		void print_to_screen(std::string msg);
-		bool IsFriendly(int, const gEntity*);
-		int AimTarget_IsTargetVisible(gEntity* entity);
+		Vector3* AdjustModelState(Vector3* vec, int state);
+		bool IsFriendly(int, const centity_t*);
+		int AimTarget_IsTargetVisible(centity_t* entity);
 		int CL_GetCurrentCmdNumber();
-		gEntity* CG_GetEntity(int cNum);
 	};
 	Screen Screen;
 	Player Player;

@@ -6,7 +6,7 @@ struct Offsets {
 	uintptr_t dwEntityList = 0x21C5828;
 	uintptr_t dwPlayerList = 0x21C13C0;
 	uintptr_t dwToNextLocal = 0x31C;
-	uintptr_t dwToNextGEntity = 0x380;
+	uintptr_t dwToNextcentity_t = 0x380;
 	uintptr_t dwViewMatrix = 0x33F0EE0;
 	uintptr_t cg_printToScreen = 0x5F4F10;
 	uintptr_t dwLocalPlayer = 0x0103AC48;
@@ -30,14 +30,6 @@ enum EntityState {
 	BAD_ENTITY = 95825825
 };
 
-enum EntityFlags : unsigned __int32 {
-	STANDING = 2,
-	CROUCH = 6,
-	PRONE = 10,
-	BARRIER = 237,
-	ZM = 67110914,
-};
-
 enum TeamType : __int32 {
 	FRIEND = 1,
 };
@@ -50,27 +42,7 @@ struct TeamInfo_t {
 }; // Size 0x0040
 
 enum EntityType : unsigned short {
-	GENERAL,
-	PLAYER,
-	PLAYER_CORPSE,
-	ITEM,
-	MISSILE,
-	INVISIBLE,
-	SCRIPTMOVIER,
-	SOUND_BLEND,
-	FX,
-	LOOP_FX,
-	PRIMARY_LIGHT,
-	TURRET,
-	HELICOPTER,
-	PLANE,
-	VEHICLE,
-	VEHICLE_CORPSE,
-	ZOMBIE,
-	ZOMBIE_SPAWNER,
-	ZOMBIE_CORPSE,
-	STREAMER_HINT,
-	ZBARRIER,
+	ZOMBIE = 166
 };
 
 typedef char pad;
@@ -138,45 +110,22 @@ struct PlayerInfo_t {
 	__int32 Headshots2;		// 0x565C -> 2347DFC
 }; // Size 0x045C ???
 
-struct centity_t {
-	__int32 ClientNum;			// 0x0000
-	EntityFlags Flags;			// 0x0004 // EntityFlags
-	char _0x0008[16];			// 0x0008
-	Vector3 Position;				// 0x0018 // Position
-	char _0x0024[24];			// 0x0024
-	Vector2 Angles;				// 0x003C // Angles x(-85up 85down) y(-180 180)
-	char _0x0044[28];			// 0x0044
-	__int32 HeldWeapon;			// 0x0060 // Weapon they're currently using
-	char _0x0064[116];			// 0x0064
-	EntityType Type;			// 0x00D8
-	char _0x00DA[66];			// 0x00DA
-	Vector3 ViewOrigin;				// 0x011C // Other position ??
-	char _0x0128[44];			// 0x0128
-	PlayerInfo_t* PlayerInfo;	// 0x0154 
-	char _0x0158[4];			// 0x0158
-	TeamInfo_t* TeamInfo;		// 0x015C 
-	char _0x0160[12];			// 0x0160
-	__int32 ModelIndex;			// 0x016C // Model ID (44 == Bus)
-	char _0x0170[56];			// 0x0170
-	__int32 Health;				// 0x01A8 // Health
-	char _0x01AC[29320];		// 0x01AC
-};
-
-struct gEntity
+struct centity_t
 {
 public:
 	char pad_0000[44]; //0x0000
 	Vector3 Position; //0x002C
-	char pad_0038[12]; //0x0038
-	Vector3 PositionOld; //0x0044
-	Vector3 ViewOrigin; //0x0050
+	Vector2 ViewAngles; //0x0038
+	char pad_0040[4]; //0x0040
+	Vector3 AbsMin; //0x0044
+	Vector3 AbsMax; //0x0050
 	char pad_005C[260]; //0x005C
 	int32_t Valid; //0x0160
-	char pad_0164[120]; //0x0164
+	int32_t eFlags2; //0x0164
+	char pad_0168[80]; //0x0168
+	int32_t ModelState; //0x01B8
+	char pad_01BC[32]; //0x01BC
 	int32_t ClientNum; //0x01DC
-	char pad_01E0[20]; //0x01E0
-	Vector3 PositionNew; //0x01F4
-	char pad_0200[608]; //0x0200
 }; 
 
 struct LocalPlayer
@@ -223,6 +172,17 @@ struct input_s
 enum State {
 	DEAD = 264194,
 	ALIVE = 2050
+};
+
+enum MODEL_STATE {
+	STANDING,
+	STANDING2 = 2,
+	CROUCH = 4,
+	CROUCH2 = 6,
+	PRONE = 8,
+	PRONE2 = 10,
+	RUNNING = 131072,
+	SHOOTING = 64,
 };
 
 enum Animation {
