@@ -1,52 +1,36 @@
 ﻿#pragma once
 #include "ImGuiManage.h"
 
-DWORD hex = 0xFFF;
-
-std::string D(std::string txt) {
-	std::string rtn = "";
-	for (char rC : txt) {
-		if (rC != ' ') {
-			DWORD at = (DWORD)rC;
-			rtn += (char)(at -= hex);
-		}
-		else
-			rtn += " ";
-	}
-
-	return rtn;
-}
-
 void CreateGui() {
 	
-	if (ImGui::Button(D("Uhrt`kr").c_str(), ImVec2(150, 25))) { //Visuals
+	if (ImGui::Button(Xor("Visuals"), ImVec2(150, 25))) { 
 		Globals::iTab = 1;
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(D("@hl").c_str(), ImVec2(150, 25))) { //Aim
+	if (ImGui::Button(Xor("Aim"), ImVec2(150, 25))) { 
 		Globals::iTab = 2;
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(D("Lhrb").c_str(), ImVec2(150, 25))) { //Misc
+	if (ImGui::Button(Xor("Misc"), ImVec2(150, 25))) { 
 		Globals::iTab = 3;
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(D("@bbntms").c_str(), ImVec2(150, 25))) { //Account
+	if (ImGui::Button(Xor("Account"), ImVec2(150, 25))) { 
 		Globals::iTab = 4;
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(D("Gnrs Nmkx").c_str(), ImVec2(150, 25))) { //Host Only
+	if (ImGui::Button(Xor("Host Only"), ImVec2(150, 25))) { 
 		Globals::iTab = 5;
 	}
 	ImGui::NewLine();
 	if (Globals::iTab == 1) {
-		ImGui::Checkbox(D("DRO").c_str(), &Globals::bEsp); 
+		ImGui::Checkbox(Xor("ESP"), &Globals::bEsp);
 		if (Globals::bEsp) {
 			ImGui::SameLine();
-			ImGui::Checkbox("Fill", &Globals::bFill);
+			ImGui::Checkbox(Xor("Fill"), &Globals::bFill);
 		}
-		ImGui::Checkbox(D("Rm`okhmdr").c_str(), &Globals::bSnapLines);
-		if (ImGui::Checkbox(D("Bg`lr").c_str(), &Globals::bChams)) {
+		ImGui::Checkbox(Xor("Snaplines"), &Globals::bSnapLines);
+		if (ImGui::Checkbox(Xor("Chams"), &Globals::bChams)) {
 			Memory::External ext;
 			if (Globals::bChams) {
 				ext.WPM<float>(0x2A0F1C0, Globals::iChamsR);
@@ -61,11 +45,11 @@ void CreateGui() {
 		}
 	}
 	if (Globals::iTab == 2) {
-		ImGui::Checkbox(D("@hlans").c_str(), &Globals::bAimbot);
-		ImGui::SliderInt(D("Rlnnsgmdrr").c_str(), & Globals::iSmoothness, 10, 1000);
-		ImGui::SliderInt(D("Q`chtr").c_str(), &Globals::iRadius, 0, 100);
+		ImGui::Checkbox(Xor("Aimbot"), &Globals::bAimbot);
+		ImGui::SliderInt(Xor("Smoothness"), &Globals::iSmoothness, 10, 1000);
+		ImGui::SliderInt(Xor("Radius"), &Globals::iRadius, 0, 100);
 		ImGui::NewLine();
-		if (ImGui::Checkbox(D("Rhkdms @hl").c_str(), &Globals::bSilentAim)) {
+		if (ImGui::Checkbox(Xor("Silent Aim"), &Globals::bSilentAim)) {
 			if (Globals::bSilentAim && !Globals::bSilentAimChk)
 				Globals::bSilentAimChk = true;
 			else if (!Globals::bSilentAim && !Globals::bSilentAimChk) {
@@ -74,21 +58,21 @@ void CreateGui() {
 		}
 	}
 	if (Globals::iTab == 3) {
-		ImGui::SliderInt("ESP Color", &Globals::iRGBESP, 0, 16777215);
-		ImGui::SameLine(); ImGui::Checkbox("ESP Animate", &Globals::bEspAnim);
+		ImGui::SliderInt(Xor("ESP Color"), &Globals::iRGBESP, 0, 16777215);
+		ImGui::SameLine(); ImGui::Checkbox(Xor("ESP Animate"), &Globals::bEspAnim);
 		ImGui::SliderInt("Snaplines Color", &Globals::iRGBSnap, 0, 16777215);
-		ImGui::SameLine(); ImGui::Checkbox("Snap Animate", &Globals::bSnapAnim);
-		ImGui::SliderInt("Animation Speed", &Globals::iAnimSpd, 0, 10000);
-		ImGui::SliderInt("Chams R", &Globals::iChamsR, 0, 255); 
-		ImGui::SliderInt("Chams G", &Globals::iChamsG, 0, 255); 
-		ImGui::SliderInt("Chams B", &Globals::iChamsB, 0, 255);
+		ImGui::SameLine(); ImGui::Checkbox(Xor("Snap Animate"), &Globals::bSnapAnim);
+		ImGui::SliderInt(Xor("Animation Speed"), &Globals::iAnimSpd, 0, 10000);
+		ImGui::SliderInt(Xor("Chams R"), &Globals::iChamsR, 0, 255); 
+		ImGui::SliderInt(Xor("Chams G"), &Globals::iChamsG, 0, 255); 
+		ImGui::SliderInt(Xor("Chams B"), &Globals::iChamsB, 0, 255);
 	}
 	if (Globals::iTab == 5) {
-		ImGui::Checkbox(D("Hmehmhsd Lnmdx").c_str(), &Globals::bInfMoney);
+		ImGui::Checkbox(Xor("Infinite Money"), &Globals::bInfMoney);
 		ImGui::SameLine();
-		ImGui::Checkbox(D("Hmehmhsd @lln").c_str(), & Globals::bInfAmmo);
+		ImGui::Checkbox(Xor("Infinite Ammo"), &Globals::bInfAmmo);
 		ImGui::NewLine();
-		if (ImGui::Checkbox(D("Fnclncd").c_str(), &Globals::bGodmode)) {
+		if (ImGui::Checkbox(Xor("God Mode"), &Globals::bGodmode)) {
 			IW5Engine engine;
 			if (!Globals::bGodmode) {
 				engine.Player.Health.SetHealth(100);

@@ -17,6 +17,7 @@ public:
 		struct Location {
 		public:
 			Vector3 Position();
+			gEntity SilentClosestEntity();
 			std::map<float, gEntity> GetClosestEntity();
 			std::map<float, gEntity> GetClosestEntityAim();
 		};
@@ -54,8 +55,9 @@ public:
 	public:
 		void print_to_screen(std::string msg);
 		bool IsFriendly(int, const gEntity*);
+		int AimTarget_IsTargetVisible(gEntity* entity);
 		int CL_GetCurrentCmdNumber();
-		int AimTarget_IsTargetVisible(int, gEntity*);
+		gEntity* CG_GetEntity(int cNum);
 	};
 	Screen Screen;
 	Player Player;

@@ -20,6 +20,58 @@ void InitImGui()
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 	io.DisplaySize = { 250,250 };
+	ImGuiStyle* style = &ImGui::GetStyle();
+
+	if (io.ConfigFlags)
+	{
+		style->WindowPadding = ImVec2(15, 15);
+		style->WindowRounding = 5.0f;
+		style->FramePadding = ImVec2(5, 5);
+		style->FrameRounding = 4.0f;
+		style->ItemSpacing = ImVec2(12, 8);
+		style->ItemInnerSpacing = ImVec2(8, 6);
+		style->IndentSpacing = 25.0f;
+		style->ScrollbarSize = 15.0f;
+		style->ScrollbarRounding = 9.0f;
+		style->GrabMinSize = 5.0f;
+		style->GrabRounding = 3.0f;
+
+		style->Colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+		style->Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+		style->Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
+		style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+		style->Colors[ImGuiCol_FrameBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+		style->Colors[ImGuiCol_FrameBgActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_TitleBg] = ImVec4(255, 0, 0, .70f);
+		style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.f, 0.f, 1.f);
+		style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0, 0, 0, 0);
+		style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_SliderGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+		style->Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_Button] = ImVec4(255, 0, 0, .70f);
+		style->Colors[ImGuiCol_ButtonHovered] = ImVec4(255, 0, 0, .85f);
+		style->Colors[ImGuiCol_ButtonActive] = ImVec4(255, 0, 0, .85f);
+		style->Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+		style->Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		style->Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+		style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+		style->Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+		style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+		style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+		style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+		style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+		style->WindowRounding = 4.0f;
+	}
 	ImGui_ImplWin32_Init(window);
 	ImGui_ImplDX11_Init(pDevice, pContext);
 }
@@ -61,7 +113,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("Cyrix - ChasePlays");
+	ImGui::Begin(Xor("Cyrix - ChasePlays"));
 
 	if (Globals::bEsp) {
 		for (const gEntity& entity : engine.Server.World.GetGEntityList()) {
@@ -93,62 +145,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
-int __cdecl hkWritePacket(int num) {
-	if (Globals::bSilentAim) {
-		Vector3 AimbottedAngles = Vector3(0, 0, 0);
-		input_s* input = (input_s*)engine.Player.Input.GetInput();
-
-		static int BackUpAngles[3];
-
-		usercmd_s* oldCmd = input->GetUserCmd(input->currentCmdNum - 1);
-		usercmd_s* cmd = input->GetUserCmd(input->currentCmdNum);
-		usercmd_s* newCmd = input->GetUserCmd(input->currentCmdNum + 1);
-
-		CopyMemory(newCmd, cmd, sizeof(usercmd_s));
-		++input->currentCmdNum;
-
-		oldCmd->viewAngles[0] = BackUpAngles[0];
-		oldCmd->viewAngles[1] = BackUpAngles[1];
-		oldCmd->viewAngles[2] = BackUpAngles[2];
-
-		BackUpAngles[0] = cmd->viewAngles[0];
-		BackUpAngles[1] = cmd->viewAngles[1];
-		BackUpAngles[2] = cmd->viewAngles[2];
-
-		++oldCmd->serverTime;
-		--cmd->serverTime;
-
-		std::map<float, gEntity> distList = engine.Player.Location.GetClosestEntity();
-		std::map<float, gEntity>::iterator it;
-		if (!distList.empty()) {
-			for (it = distList.begin(); it != distList.end(); it++);
-			gEntity entity = it->second;
-			LocalPlayer p = engine.Player.GetLocalPlayer();
-			Vector3 them = entity.Position; them.z += 40.f;
-			Vector3 self = Vector3(p.ViewOrigin.x, p.ViewOrigin.y, p.ViewOrigin.z);
-			m.GetAngleToTarget(them, self, AimbottedAngles);
-			DeltaX = AimbottedAngles.x - inter.RPM<float>(0x0103AC60);
-			DeltaY = AimbottedAngles.y - inter.RPM<float>(0x0103AC5C);
-
-			float flOldYaw = ShortToAngle(oldCmd->viewAngles[1]);
-
-			oldCmd->viewAngles[0] += ANGLE2SHORT(DeltaY);
-			oldCmd->viewAngles[1] += ANGLE2SHORT(DeltaX);
-		}
-	}
-
-	return pHookWritePacket(num);
-}
-
-int rAddHook(int* a1, int ent, int ent_num, int renderflags, int a2, int a3, int a4, bool a5, int a6, int scs, int a8, float a9, bool a10) {
-	if (Globals::bChams) {
-		if (ent_num >= 23 && ent_num <= 45) {
-			return rAdd(a1, ent, ent_num, -1, a2, a3, a4, a5, a6, scs, a8, a9, a10);
-		}
-	}
-	return rAdd(a1, ent, ent_num, renderflags, a2, a3, a4, a5, a6, scs, a8, a9, a10);
-}
-
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
 	CScreen::Info sInfo;
@@ -165,19 +161,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 		}
 	} while (!init_hook);
 
-	pHookWritePacketTarget = reinterpret_cast<CL_WritePacket>(offsets.CL_WritePacket);
-	rAddTarget = reinterpret_cast<R_AddDObjToScene>(offsets.R_AddDObjToScene);
-	if (MH_CreateHook((LPVOID*)pHookWritePacketTarget, &hkWritePacket, (void**)&pHookWritePacket) != MH_OK)
-	{
-		MessageBoxA(0, "MH Failed", "Failed", 0);
-	}
-	MH_Initialize();
-	if (MH_CreateHook((LPVOID*)rAddTarget, &rAddHook, (void**)&rAdd) != MH_OK)
-	{
-		MessageBoxA(0, "MH Failed", "Failed", 0);
-	}
-	if (MH_EnableHook((LPVOID*)rAddTarget) != MH_OK)
-		std::cout << "Failed!!\n";
+	IntializeVehHook();
 
 	std::thread tMisc(miscThread);
 	tMisc.detach();
@@ -187,22 +171,6 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 			uintptr_t dwMoney = pInfo.moduleBase + 0x1F47D68;
 			external.WPM<int>(dwMoney, 999999);
 			Globals::bInfMoney = false;
-		}
-		if (Globals::bSilentAim) {
-			if (Globals::bSilentAimChk) {
-				Globals::bSilentAimChk = false;
-				if (MH_EnableHook((LPVOID*)pHookWritePacketTarget) != MH_OK)
-				{
-					MessageBoxA(0, "MH Failed", "Failed", 0);
-				}
-			}
-		}
-		if (Globals::bSilentUnhook) {
-			Globals::bSilentUnhook = false;
-			if (MH_DisableHook((LPVOID*)pHookWritePacketTarget) != MH_OK)
-			{
-				MessageBoxA(0, "MH Failed", "Failed", 0);
-			}
 		}
 		if (Globals::bAimbot) {
 			if (GetAsyncKeyState(VK_RBUTTON)) {

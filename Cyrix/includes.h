@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <d3d11.h>
+#include "Xor.h"
 #include <dxgi.h>
 #include "kiero/kiero.h"
 #include "imgui/imgui.h"

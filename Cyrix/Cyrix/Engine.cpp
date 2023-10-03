@@ -54,11 +54,12 @@ bool IW5Engine::Functions::IsFriendly(int cNum, const gEntity* cEntity)
 	return setup(cNum, cEntity);
 }
 
-int IW5Engine::Functions::AimTarget_IsTargetVisible(int cNum, gEntity* cEntity)
+int IW5Engine::Functions::AimTarget_IsTargetVisible(gEntity* entity)
 {
 	typedef char(__cdecl* stup)(int, gEntity*);
 	stup setup = reinterpret_cast<stup>(off.AimTarget_IsTargetVisible);
-	return setup(cNum, cEntity);
+	
+	return setup(0, entity);
 }
 
 IntVector2 IW5Engine::Screen::GetResolution()
@@ -80,6 +81,44 @@ int IW5Engine::Functions::CL_GetCurrentCmdNumber()
 	typedef int(__cdecl* setup)(int num);
 	setup GetCmdNum = reinterpret_cast<setup>(off.CL_GetCurrentCmdNumber);
 	return GetCmdNum(0);
+}
+
+gEntity* IW5Engine::Functions::CG_GetEntity(int cNum)
+{
+	typedef gEntity*(__cdecl* setup)(int, int);
+	setup CG_GetEntity = reinterpret_cast<setup>(off.CG_GetEntity);
+	return CG_GetEntity(0, cNum);
+}
+
+gEntity IW5Engine::Player::Location::SilentClosestEntity()
+{
+	IW5Engine engine; int max_dist = 999999, i = 0, entAt = 0;
+	gEntity badEnt; badEnt.Valid = EntityState::BAD_ENTITY; bool isVis = false;
+	std::vector<gEntity> list = engine.Server.World.GetGEntityList();
+	for (gEntity entity : list) {
+		int dist = (int)(Dist3D(engine.Player.GetLocalPlayer().Position, entity.Position));
+		if (engine.Functions.AimTarget_IsTargetVisible(&entity)) {
+			if (!isVis)
+				max_dist = 999999;
+			isVis = true;
+			if (dist < max_dist) {
+				max_dist = dist;
+				entAt = i;
+			}
+		}
+		else if (dist < max_dist && !isVis) {
+			max_dist = dist;
+			entAt = i;
+		}
+		i++;
+	}
+
+	if (max_dist < 999999)
+		return list.at(entAt);
+	else
+		return badEnt;
+
+	return badEnt;
 }
 
 std::map<float, gEntity> IW5Engine::Player::Location::GetClosestEntity()

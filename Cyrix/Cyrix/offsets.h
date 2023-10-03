@@ -19,9 +19,15 @@ struct Offsets {
 	uintptr_t dwPlayerInfo_t = 0x23427A0;
 	uintptr_t dwHealth = 0x21C1568;
 
+	uintptr_t dwNoDelta = 0x1198444;
+	uintptr_t CG_GetEntity = 0x4F03A0;
 	uintptr_t R_AddDObjToScene = 0x724CC0;
 	uintptr_t CL_GetCurrentCmdNumber = 0x490A50;
 	uintptr_t CL_WritePacket = 0x444C60;
+};
+
+enum EntityState {
+	BAD_ENTITY = 95825825
 };
 
 enum EntityFlags : unsigned __int32 {
@@ -171,7 +177,7 @@ public:
 	char pad_01E0[20]; //0x01E0
 	Vector3 PositionNew; //0x01F4
 	char pad_0200[608]; //0x0200
-}; //Size: 0x0460
+}; 
 
 struct LocalPlayer
 {
